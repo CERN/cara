@@ -15,15 +15,11 @@ import cara.monte_carlo as mc
 from .. import calculator
 from cara.monte_carlo.data import activity_distributions, virus_distributions, mask_distributions, short_range_distances
 from cara.monte_carlo.data import expiration_distribution, expiration_BLO_factors, expiration_distributions, short_range_expiration_distributions
+from .DEFAULT_DATA import __version__, _NO_DEFAULT, _DEFAULT_MC_SAMPLE_SIZE, _DEFAULTS as d, ACTIVITY_TYPES, MECHANICAL_VENTILATION_TYPES, MASK_TYPES, MASK_WEARING_OPTIONS, VENTILATION_TYPES, VIRUS_TYPES, VOLUME_TYPES, WINDOWS_OPENING_REGIMES, WINDOWS_TYPES, COFFEE_OPTIONS_INT, MONTH_NAMES
 
 LOG = logging.getLogger(__name__)
 
 minutes_since_midnight = typing.NewType('minutes_since_midnight', int)
-
-# Used to declare when an attribute of a class must have a value provided, and
-# there should be no default value used.
-_NO_DEFAULT = object()
-_DEFAULT_MC_SAMPLE_SIZE = 250000
 
 
 @dataclasses.dataclass
@@ -82,59 +78,9 @@ class FormData:
 
     #: The default values for undefined fields. Note that the defaults here
     #: and the defaults in the html form must not be contradictory.
-    _DEFAULTS: typing.ClassVar[typing.Dict[str, typing.Any]] = {
-        'activity_type': 'office',
-        'air_changes': 0.,
-        'air_supply': 0.,
-        'calculator_version': _NO_DEFAULT,
-        'ceiling_height': 0.,
-        'exposed_coffee_break_option': 'coffee_break_0',
-        'exposed_coffee_duration': 5,
-        'exposed_finish': '17:30',
-        'exposed_lunch_finish': '13:30',
-        'exposed_lunch_option': True,
-        'exposed_lunch_start': '12:30',
-        'exposed_start': '08:30',
-        'event_month': 'January',
-        'floor_area': 0.,
-        'hepa_amount': 0.,
-        'hepa_option': False,
-        'humidity': '',
-        'infected_coffee_break_option': 'coffee_break_0',
-        'infected_coffee_duration': 5,
-        'infected_dont_have_breaks_with_exposed': False,
-        'infected_finish': '17:30',
-        'infected_lunch_finish': '13:30',
-        'infected_lunch_option': True,
-        'infected_lunch_start': '12:30',
-        'infected_people': _NO_DEFAULT,
-        'infected_start': '08:30',
-        'inside_temp': 293.,
-        'location_latitude': _NO_DEFAULT,
-        'location_longitude': _NO_DEFAULT,
-        'location_name': _NO_DEFAULT,
-        'mask_type': 'Type I',
-        'mask_wearing_option': 'mask_off',
-        'mechanical_ventilation_type': 'not-applicable',
-        'opening_distance': 0.,
-        'room_heating_option': False,
-        'room_number': _NO_DEFAULT,
-        'room_volume': 0.,
-        'simulation_name': _NO_DEFAULT,
-        'total_people': _NO_DEFAULT,
-        'ventilation_type': 'no_ventilation',
-        'virus_type': 'SARS_CoV_2',
-        'volume_type': _NO_DEFAULT,
-        'window_type': 'window_sliding',
-        'window_height': 0.,
-        'window_width': 0.,
-        'windows_duration': 0.,
-        'windows_frequency': 0.,
-        'windows_number': 0,
-        'window_opening_regime': 'windows_open_permanently',
-        'short_range_option': 'short_range_no',
-        'short_range_interactions': '[]',
-    }
+    _DEFAULTS: typing.ClassVar[typing.Dict[str, typing.Any]] = d
+    MONTHS = list(MONTH_NAMES.keys())
+    
 
     @classmethod
     def from_dict(cls, form_data: typing.Dict) -> "FormData":
@@ -213,7 +159,7 @@ class FormData:
                              ('volume_type', VOLUME_TYPES),
                              ('window_opening_regime', WINDOWS_OPENING_REGIMES),
                              ('window_type', WINDOWS_TYPES),
-                             ('event_month', MONTH_NAMES)]
+                             ('event_month', self.MONTHS)]
         for attr_name, valid_set in validation_tuples:
             if getattr(self, attr_name) not in valid_set:
                 raise ValueError(f"{getattr(self, attr_name)} is not a valid value for {attr_name}")
@@ -283,7 +229,7 @@ class FormData:
         be *added* to UTC to convert to the form location's timezone.
 
         """
-        month = MONTH_NAMES.index(self.event_month) + 1
+        month = self.MONTHS.index(self.event_month) + 1
         timezone = cara.data.weather.timezone_at(
             latitude=self.location_latitude, longitude=self.location_longitude,
         )
@@ -302,7 +248,7 @@ class FormData:
         timezone.
 
         """
-        month = MONTH_NAMES.index(self.event_month) + 1
+        month = self.MONTHS.index(self.event_month) + 1
 
         wx_station = self.nearest_weather_station()
         temp_profile = cara.data.weather.mean_hourly_temperatures(wx_station[0], month)
@@ -705,7 +651,7 @@ def baseline_raw_form_data() -> typing.Dict[str, typing.Union[str, float]]:
         'mask_type': 'Type I',
         'mask_wearing_option': 'mask_off',
         'mechanical_ventilation_type': '',
-        'calculator_version': calculator.__version__,
+        'calculator_version': __version__,
         'opening_distance': '0.2',
         'event_month': 'January',
         'room_heating_option': '0',
@@ -726,24 +672,6 @@ def baseline_raw_form_data() -> typing.Dict[str, typing.Union[str, float]]:
         'short_range_option': 'short_range_no',
         'short_range_interactions': '[]',
     }
-
-
-ACTIVITY_TYPES = {'office', 'smallmeeting', 'largemeeting', 'training', 'callcentre', 'controlroom-day', 'controlroom-night', 'library', 'workshop', 'lab', 'gym'}
-MECHANICAL_VENTILATION_TYPES = {'mech_type_air_changes', 'mech_type_air_supply', 'not-applicable'}
-MASK_TYPES = {'Type I', 'FFP2'}
-MASK_WEARING_OPTIONS = {'mask_on', 'mask_off'}
-VENTILATION_TYPES = {'natural_ventilation', 'mechanical_ventilation', 'no_ventilation'}
-VIRUS_TYPES = {'SARS_CoV_2', 'SARS_CoV_2_ALPHA', 'SARS_CoV_2_BETA','SARS_CoV_2_GAMMA', 'SARS_CoV_2_DELTA', 'SARS_CoV_2_OMICRON'}
-VOLUME_TYPES = {'room_volume_explicit', 'room_volume_from_dimensions'}
-WINDOWS_OPENING_REGIMES = {'windows_open_permanently', 'windows_open_periodically', 'not-applicable'}
-WINDOWS_TYPES = {'window_sliding', 'window_hinged', 'not-applicable'}
-
-COFFEE_OPTIONS_INT = {'coffee_break_0': 0, 'coffee_break_1': 1, 'coffee_break_2': 2, 'coffee_break_4': 4}
-
-MONTH_NAMES = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July',
-    'August', 'September', 'October', 'November', 'December',
-]
 
 
 def _hours2timestring(hours: float):

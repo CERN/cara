@@ -25,14 +25,7 @@ from . import model_generator
 from .report_generator import ReportGenerator, calculate_report_data
 from .user import AuthenticatedUser, AnonymousUser
 
-# The calculator version is based on a combination of the model version and the
-# semantic version of the calculator itself. The version uses the terms
-# "{MAJOR}.{MINOR}.{PATCH}" to describe the 3 distinct numbers constituting a version.
-# Effectively, if the model increases its MAJOR version then so too should this
-# calculator version. If the calculator needs to make breaking changes (e.g. change
-# form attributes) then it can also increase its MAJOR version without needing to
-# increase the overall CARA version (found at ``cara.__version__``).
-__version__ = "4.2"
+from . import DEFAULT_DATA
 
 
 class BaseRequestHandler(RequestHandler):
@@ -226,8 +219,10 @@ class CalculatorForm(BaseRequestHandler):
             user=self.current_user,
             xsrf_form_html=self.xsrf_form_html(),
             calculator_prefix=self.settings["calculator_prefix"],
-            calculator_version=__version__,
+            calculator_version=DEFAULT_DATA.__version__,
             text_blocks=markdown_tools.extract_rendered_markdown_blocks(template_environment.get_template('common_text.md.j2')),
+            default = DEFAULT_DATA._DEFAULTS,
+            MONTH_NAMES = DEFAULT_DATA.MONTH_NAMES
         )
         self.finish(report)
 
