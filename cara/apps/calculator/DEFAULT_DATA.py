@@ -1,4 +1,5 @@
 import tornado.web
+import typing
 
 # ------------------ Translation ----------------------
 
@@ -74,19 +75,18 @@ _DEFAULTS = {
 
 # ------------------ Activities ----------------------
 
-# ACTIVITY_TYPES = [
-#     {'name:': 'office', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 2}}, # Mostly silent in the office, but 1/3rd of time speaking.
-#     {'name:': 'smallmeeting', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 2}}, #self.total_people - 1}}, # Conversation of N people is approximately 1/N% of the time speaking.
-#     {'name:': 'largemeeting', 'activity': 'Standing', 'expiration': {'Speaking': 1, 'Breathing': 2}}, # each infected person spends 1/3 of time speaking.
-#     {'name:': 'training', 'activity': 'Standing', 'expiration': 'Speaking'},
-#     {'name:': 'callcentre', 'activity': 'Seated', 'expiration': 'Speaking'},
-#     {'name:': 'controlroom-day', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 1}}, # Daytime control room shift, 50% speaking.
-#     {'name:': 'controlroom-night', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 9}}, # Nightshift control room, 10% speaking.
-#     {'name:': 'library', 'activity': 'Seated', 'expiration': 'Breathing'}, 
-#     {'name:': 'workshop', 'activity': 'Moderate activity', 'expiration': {'Speaking': 1, 'Breathing': 1}}, #Model 1/2 of time spent speaking in a workshop.
-#     {'name:': 'lab', 'activity': 'Light activity', 'expiration': {'Speaking': 1, 'Breathing': 1}}, #Model 1/2 of time spent speaking in a lab.
-#     {'name:': 'gym', 'activity': 'Heavy exercise', 'expiration': 'Breathing'}]
-ACTIVITY_TYPES = {'office', 'smallmeeting', 'largemeeting', 'training', 'callcentre', 'controlroom-day', 'controlroom-night', 'library', 'workshop', 'lab', 'gym'}
+ACTIVITY_TYPES: typing.List[typing.Dict[str, typing.Any]] = [
+    {'name': 'office', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 2}}, # Mostly silent in the office, but 1/3rd of time speaking.
+    {'name': 'smallmeeting', 'activity': 'Seated', 'expiration': {}}, # Define expiration type in model_generator.py, since it depends on the number of exposed people.
+    {'name': 'largemeeting', 'activity': 'Standing', 'expiration': {'Speaking': 1, 'Breathing': 2}}, # each infected person spends 1/3 of time speaking.
+    {'name': 'training', 'activity': 'Standing', 'expiration': 'Speaking'},
+    {'name': 'callcentre', 'activity': 'Seated', 'expiration': 'Speaking'},
+    {'name': 'controlroom-day', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 1}}, # Daytime control room shift, 50% speaking.
+    {'name': 'controlroom-night', 'activity': 'Seated', 'expiration': {'Speaking': 1, 'Breathing': 9}}, # Nightshift control room, 10% speaking.
+    {'name': 'library', 'activity': 'Seated', 'expiration': 'Breathing'}, 
+    {'name': 'workshop', 'activity': 'Moderate activity', 'expiration': {'Speaking': 1, 'Breathing': 1}}, #Model 1/2 of time spent speaking in a workshop.
+    {'name': 'lab', 'activity': 'Light activity', 'expiration': {'Speaking': 1, 'Breathing': 1}}, #Model 1/2 of time spent speaking in a lab.
+    {'name': 'gym', 'activity': 'Heavy exercise', 'expiration': 'Breathing'}]
 
 # ------------------ Validation ----------------------
 

@@ -80,6 +80,7 @@ class FormData:
     #: and the defaults in the html form must not be contradictory.
     _DEFAULTS: typing.ClassVar[typing.Dict[str, typing.Any]] = d
     MONTHS = list(MONTH_NAMES.keys())
+    ACTIVITIES = { activity['name'] for activity in ACTIVITY_TYPES }
     
 
     @classmethod
@@ -148,7 +149,7 @@ class FormData:
                 raise ValueError(
                     f"{start_name} must be less than {end_name}. Got {start} and {end}.")
 
-        validation_tuples = [('activity_type', ACTIVITY_TYPES),    
+        validation_tuples = [('activity_type', self.ACTIVITIES),    
                              ('exposed_coffee_break_option', COFFEE_OPTIONS_INT), 
                              ('infected_coffee_break_option', COFFEE_OPTIONS_INT),   
                              ('mechanical_ventilation_type', MECHANICAL_VENTILATION_TYPES),
@@ -337,47 +338,14 @@ class FormData:
         # Initializes the virus
         virus = virus_distributions[self.virus_type]
 
-        scenario_activity_and_expiration = {
-            'office': (
-                'Seated',
-                # Mostly silent in the office, but 1/3rd of time speaking.
-                {'Speaking': 1, 'Breathing': 2}
-            ),
-            'controlroom-day': (
-                'Seated',
-                # Daytime control room shift, 50% speaking.
-                {'Speaking': 1, 'Breathing': 1}
-            ),
-            'controlroom-night': (
-                'Seated',
-                # Nightshift control room, 10% speaking.
-                {'Speaking': 1, 'Breathing': 9}
-            ),
-            'smallmeeting': (
-                'Seated',
-                # Conversation of N people is approximately 1/N% of the time speaking.
-                {'Speaking': 1, 'Breathing': self.total_people - 1}
-            ),
-            'largemeeting': (
-                'Standing',
-                # each infected person spends 1/3 of time speaking.
-                {'Speaking': 1, 'Breathing': 2}
-            ),
-            'callcentre': ('Seated', 'Speaking'),
-            'library': ('Seated', 'Breathing'),
-            'training': ('Standing', 'Speaking'),
-            'lab': (
-                'Light activity',
-                #Model 1/2 of time spent speaking in a lab.
-                {'Speaking': 1, 'Breathing': 1}),
-            'workshop': (
-                'Moderate activity',
-                #Model 1/2 of time spent speaking in a workshop.
-                {'Speaking': 1, 'Breathing': 1}),
-            'gym':('Heavy exercise', 'Breathing'),
-        }
-
-        [activity_defn, expiration_defn] = scenario_activity_and_expiration[self.activity_type]
+        activity_index = list(self.ACTIVITIES).index(self.activity_type)
+        activity_defn = ACTIVITY_TYPES[activity_index]['activity']
+        if (self.activity_type == 'smallmeeting'):
+            # Conversation of N people is approximately 1/N% of the time speaking.
+            expiration_defn = {'Speaking': 1, 'Breathing': self.total_people - 1}
+        else:
+            expiration_defn = ACTIVITY_TYPES[activity_index]['expiration']
+        
         activity = activity_distributions[activity_defn]
         expiration = build_expiration(expiration_defn)
 
