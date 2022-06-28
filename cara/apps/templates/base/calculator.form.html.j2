@@ -317,19 +317,15 @@
     <div class="form-group row">
     <div class="col-sm-4"><label class="col-form-label">{{_("Activity type:")}}</label></div>
     <div class="col-sm-6">
-      <select id="activity_type" name="activity_type" class="form-control">
-        <option value="office">Office</option>
-        <option value="smallmeeting">Small meeting (<10 occ.)</option>
-        <option value="largemeeting">Large meeting (>=10 occ.)</option>
-        <option value="callcentre">Call Centre</option>
-        <option value="controlroom-day">Control Room - Day shift</option>
-        <option value="controlroom-night">Control Room - Night shift</option>
-        <option value="library">Library</option>
-        <option value="lab">Laboratory</option>
-        <option value="workshop">Workshop</option>
-        <option value="training">Conference/Training</option>
-        <option value="gym">Gym</option>
-      </select>
+    <select id="activity_type" name="activity_type" class="form-control">
+      {% set default_activity_type = ACTIVITY_TYPES | selectattr('id', 'equalto', default.activity_type) | first %}
+      <option selected value="{{default_activity_type}}">{{_(default_activity_type.name)}}</option>
+      {% for activity in ACTIVITY_TYPES %}
+        {% if activity.id != default.activity_type %}
+          <option value="{{activity.id}}">{{_(activity.name)}}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
     </div>
     </div>
 
