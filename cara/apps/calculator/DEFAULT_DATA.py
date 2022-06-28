@@ -104,3 +104,33 @@ MONTH_NAMES = {
     'January' : _('January'), 'February' : _('February'), 'March' : _('March'), 'April' : _('April'), 'May' : _('May'), 'June' :_('June'), 'July' : _('July'),
     'August' : _('August'), 'September' : _('September'), 'October': _('October'), 'November' : _('November'), 'December' : _('December'),
 }
+
+# ------------------ Text ----------------------
+
+TOOLTIPS = {
+    'virus_data': _('Choose the SARS-CoV-2 Variant of Concern (VOC).'),
+    'room_data': _('The area you wish to study (choose one of the 2 options). Indicate if a central (radiator-type) heating system is in use.'),
+    'room_data_cern': _('The area you wish to study (choose one of the 2 options). Use GIS Portal or measure. Also indicate if a central (radiator-type) heating system is in use.'),
+    'ventilation_data': _('The available means of venting / filtration of indoor spaces.'),
+    'face_masks': _('Masks worn at workstations or removed when a 2m physical distance is respected and proper venting is ensured.'),
+    'event_data': _('The total no. of occupants in the room and how many of them you assume are infected.'),
+    'activity_breaks': _('Input breaks that, by default, are the same for infected/exposed person(s) unless specified otherwise.'),
+}
+
+PLACEHOLDERS = {
+    'simulation_name': _('E.g. Workshop without masks'),
+    'room_number': _('E.g. 17/R-033'),
+    'room_volume': _('Room volume (m³)'),
+    'room_floor_area': _('Room floor area (m²)'),
+    'ceiling_height': _('Room ceiling height (m)'),
+    'air_supply': _('Flow rate (m³ / hour)'),
+    'air_changes': _('Air exchange (h⁻¹)'),
+    'windows_number': _('Number (#)'),
+    'window_height': _('Height (m)'),
+    'window_width': _('Width (m)'),
+    'opening_distance': _('Opening distance (m)'),
+    'duration': _('Duration (min)'),
+    'frequency': _('Frequency (min)'),
+    'hepa_amount': _('Flow rate (m³ / hour)'),
+    'total_people': _('Number (#)'),
+}
