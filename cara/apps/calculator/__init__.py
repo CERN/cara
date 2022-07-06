@@ -90,6 +90,17 @@ class Missing404Handler(BaseRequestHandler):
 
 class ConcentrationModel(BaseRequestHandler):
     async def post(self):
+        language = self.get_cookie('language') or 'null'
+        if language == "null" : 
+            template_environment = self.settings["template_environment"]
+            template_environment.globals['_']=tornado.locale.get(self.locale.code).translate
+            _ = tornado.locale.get(self.locale.code).translate
+            locale_code = tornado.locale.get(language)
+        else :
+            template_environment = self.settings["template_environment"]
+            template_environment.globals['_']=tornado.locale.get(language ).translate
+            _ = tornado.locale.get(language ).translate    
+            locale_code = tornado.locale.get(language)
         requested_model_config = {
             name: self.get_argument(name) for name in self.request.arguments
         }
@@ -116,7 +127,7 @@ class ConcentrationModel(BaseRequestHandler):
             timeout=300,
         )
         report_task = executor.submit(
-            report_generator.build_report, base_url, form,
+            report_generator.build_report, base_url, form, language,
             executor_factory=functools.partial(
                 concurrent.futures.ThreadPoolExecutor,
                 self.settings['report_generation_parallelism'],
