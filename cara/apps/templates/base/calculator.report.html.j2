@@ -132,7 +132,7 @@
 													{% if form.p_recurrent_option == "p_specific_event" %}
 														<br>
 														<div class="align-self-center alert alert-dark mb-0" role="alert">
-															The above result assumes that <b>{{ form.infected_people }} 
+															The above {{ "result assumes" if form.short_range_option == "short_range_no" else "results assume" }} that <b>{{ form.infected_people }} 
 															{{ "occupant is infected" if form.infected_people == 1 else "occupants are infected" }}
 															</b> in the room. 
 															By taking into account the estimate of cases currently circulating in <b>{{ form.location_name }}</b>, 
