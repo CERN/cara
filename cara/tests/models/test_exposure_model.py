@@ -234,17 +234,48 @@ def test_infectious_dose_vectorisation(sr_model):
 
 
 @pytest.mark.parametrize(
-    "population, cm, pop, cases, AB, specific_event_probability",[
-    [populations[1], known_concentrations(lambda t: 36.),
-     100000, 68, 5, 2.24124],
-    [populations[0], known_concentrations(lambda t: 36.),
-     100000, 68, 5, 1.875652],
+    "pop, cases, AB, prob_random_individual", [
+        [100_000, 67, 5, 0.00335],
+        [200_000, 121, 5, 0.003025],
+        [np.array([100_000, 200_000]), 67, 10, np.array([0.0067, 0.00335])],
+        [150_000, np.array([67, 121]), 2, np.array([0.00089333, 0.00161333])],
+        [np.array([100_000, 200_000]), np.array([67, 121]), 5, np.array([0.00335, 0.003025])]
+    ]
+)
+def test_probability_random_individual(pop, cases, AB, prob_random_individual):
+    model = models.Cases(geographic_population=pop, geographic_cases=cases, 
+                        ascertainment_bias=AB)
+    np.testing.assert_allclose(
+        model.probability_random_individual(), prob_random_individual, rtol=0.05
+    )
 
+
+@pytest.mark.parametrize(
+    "pop, cases, AB, exposed, infected, prob_meet_infected_person", [
+        [100_000, 67, 5, 10, 2, 0.00049],
+        [200_000, 121, 5, 10, 1, 0.02944],
+        [np.array([100_000, 200_000]), 67, 10, 15, 2, np.array([0.00432, 0.00113])],
+        [150_000, np.array([67, 121]), 2, np.array([10, 15]), np.array([1, 2]), np.array([0.00886, 0.00027])],
+    ]
+)
+def test_prob_meet_infected_person(pop, cases, AB, exposed, infected, prob_meet_infected_person):
+    model = models.Cases(geographic_population=pop, geographic_cases=cases, 
+                        ascertainment_bias=AB)
+    np.testing.assert_allclose(model.probability_meet_infected_person(exposed, infected),
+                            prob_meet_infected_person, rtol=0.05)
+
+
+@pytest.mark.parametrize(
+    "population, cm, pop, cases, AB, specific_event_probability",[
+        [populations[1], known_concentrations(lambda t: 36.),
+        100000, 68, 5, 2.24124],
+        [populations[0], known_concentrations(lambda t: 36.),
+        100000, 68, 5, 1.875652],
     ])
 def test_specific_event_probability(population, cm,
         pop, AB, cases, specific_event_probability):
     model = ExposureModel(cm, (), population, models.Cases(geographic_population=pop,
-    geographic_cases=cases, geographic_conf_level=AB))
+    geographic_cases=cases, ascertainment_bias=AB))
     np.testing.assert_allclose(
         model.total_probability_rule(), specific_event_probability, rtol=0.05
     )
