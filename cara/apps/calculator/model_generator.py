@@ -58,7 +58,7 @@ class FormData:
     location_longitude: float
     geographic_population: int
     geographic_cases: int
-    geographic_conf_level: str
+    ascertainment_bias: str
     p_recurrent_option: str
     mask_type: str
     mask_wearing_option: str
@@ -118,7 +118,7 @@ class FormData:
         'location_longitude': _NO_DEFAULT,
         'geographic_population': 0,
         'geographic_cases': 0,
-        'geographic_conf_level': 'confidence_low',
+        'ascertainment_bias': 'confidence_low',
         'p_recurrent_option': 'p_recurrent_event',
         'location_name': _NO_DEFAULT,
         'mask_type': 'Type I',
@@ -222,7 +222,7 @@ class FormData:
                              ('window_opening_regime', WINDOWS_OPENING_REGIMES),
                              ('window_type', WINDOWS_TYPES),
                              ('event_month', MONTH_NAMES),
-                             ('geographic_conf_level', CONFIDENCE_LEVEL_OPTIONS),]
+                             ('ascertainment_bias', CONFIDENCE_LEVEL_OPTIONS),]
         for attr_name, valid_set in validation_tuples:
             if getattr(self, attr_name) not in valid_set:
                 raise ValueError(f"{getattr(self, attr_name)} is not a valid value for {attr_name}")
@@ -284,7 +284,7 @@ class FormData:
             geographical_data=mc.Cases(
                 geographic_population=self.geographic_population,
                 geographic_cases=self.geographic_cases,
-                geographic_conf_level=CONFIDENCE_LEVEL_OPTIONS[self.geographic_conf_level],
+                ascertainment_bias=CONFIDENCE_LEVEL_OPTIONS[self.ascertainment_bias],
             ), 
         )
 
@@ -720,7 +720,7 @@ def baseline_raw_form_data() -> typing.Dict[str, typing.Union[str, float]]:
         'location_name': 'Geneva',
         'geographic_population': 0,
         'geographic_cases': 0,
-        'geographic_conf_level': 'confidence_low',
+        'ascertainment_bias': 'confidence_low',
         'mask_type': 'Type I',
         'mask_wearing_option': 'mask_off',
         'mechanical_ventilation_type': '',

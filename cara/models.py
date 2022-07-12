@@ -918,21 +918,21 @@ class Cases:
     #: Geographic location population
     geographic_population: int = 0
 
-    #: Geographic location cases
+    #: Geographic location new cases
     geographic_cases: int = 0
 
-    #: Geographic confidence level
-    geographic_conf_level: int = 0
+    #: Number of new cases confidence level
+    ascertainment_bias: int = 0
 
     def probability_random_individual(self) -> _VectorisedFloat:
         """Probability that a randomly selected individual in a focal population is infected."""
-        return self.geographic_cases*self.geographic_conf_level/self.geographic_population
+        return self.geographic_cases*self.ascertainment_bias/self.geographic_population
 
     def probability_meet_infected_person(self, event, x) -> _VectorisedFloat:
-        """Probability to meet x infected persons in an event."""
-        
-        # Ascertainment bias
-        AB = self.geographic_conf_level
+        """
+        Probability to meet x infected persons in an event.
+        From https://doi.org/10.1038/s41562-020-01000-9.
+        """
         return sct.binom.pmf(x, event, self.probability_random_individual())
 
 
@@ -1457,7 +1457,9 @@ class ExposureModel:
             sum_probability = 0.0
             # Create an equivalent exposure model but with i infected cases
             total_people = self.concentration_model.infected.number + self.exposed.number
-            X = (total_people if total_people < 10 else 10)
+            X = (total_people if total_people < 10 else 10) 
+            # The influence of a higher number of infected people (>1) is almost negligible for this probability calculation.
+            # Therefore we decided a hard limit of 10 infected people.
             for x in range(1, X):
                 exposure_model = nested_replace(
                     self, {'concentration_model.infected.number': x}
