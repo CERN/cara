@@ -10,7 +10,6 @@ import urllib
 import zlib
 
 import jinja2
-from cara.apps.calculator.user import AnonymousUser, AuthenticatedUser
 import numpy as np
 import tornado
 
@@ -346,11 +345,10 @@ class ReportGenerator:
             base_url: str,
             form: FormData,
             language: str,
-            user: typing.Union[AuthenticatedUser, AnonymousUser],
             executor_factory: typing.Callable[[], concurrent.futures.Executor],
     ) -> str:
         model = form.build_model()
-        context = self.prepare_context(base_url, model, form, language, user, executor_factory=executor_factory)
+        context = self.prepare_context(base_url, model, form, language, executor_factory=executor_factory)
         return self.render(context)
 
     def prepare_context(
@@ -359,7 +357,6 @@ class ReportGenerator:
             model: models.ExposureModel,
             form: FormData,
             language: str,
-            user: typing.Union[AuthenticatedUser, AnonymousUser],
             executor_factory: typing.Callable[[], concurrent.futures.Executor],
     ) -> dict:
         now = datetime.utcnow().astimezone()
@@ -370,7 +367,6 @@ class ReportGenerator:
             'form': form,
             'creation_date': time,
             'language': language,
-            'user': user,
         }
 
         scenario_sample_times = interesting_times(model)
